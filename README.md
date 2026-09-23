@@ -30,6 +30,38 @@ Implementation and review were AI-assisted using Claude, ChatGPT and Codex; I re
 - [`samples/n8n/`](samples/n8n/README.md) — sanitized exports of the AI assistant workflow and the RAG knowledge-loading pipeline, importable into a disposable n8n instance for inspection.
 - [`portfolio/CASE_STUDY.md`](portfolio/CASE_STUDY.md) — the narrative write-up of finding and fixing the XSS exposure, end to end.
 
+## Screenshots
+
+### AI assistant in production
+
+Customer-support chat connected to the n8n-based AI/RAG workflow.
+
+![AI assistant in production](screenshots/ai-chat-live.jpg)
+
+### n8n AI workflow
+
+AI orchestration workflow covering web chat, Telegram, AI Agent, retrieval tools, PostgreSQL memory, voice transcription and escalation paths.
+
+![n8n AI workflow](screenshots/n8n-ai-workflow.jpg)
+
+### Production storefront
+
+Customized nopCommerce storefront used by the food-commerce business.
+
+![Production storefront](screenshots/storefront-home.jpg)
+
+### Business checkout flow
+
+Customized checkout flow supporting business purchases and company-data handling.
+
+![Business checkout flow](screenshots/checkout-business-flow.jpg)
+
+### Shopping cart
+
+Customized cart and checkout experience, including discount and gift-card handling.
+
+![Shopping cart](screenshots/shopping-cart.jpg)
+
 ## Business Problem
 
 Dobroty needed to move a food-retail store from an older nopCommerce generation to a current one, add business rules a stock e-commerce platform doesn't provide out of the box (Czech B2B invoicing with company lookup, postal-code delivery eligibility, automatic loyalty tiers), and give customers a fast way to ask product questions without adding a full-time support headcount.
