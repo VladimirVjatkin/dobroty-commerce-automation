@@ -1,0 +1,770 @@
+{
+  "name": "Dobroty Portfolio - Knowledge Loader",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT category, title, content FROM company_info",
+        "options": {}
+      },
+      "id": "a5e4641d-b26a-4750-bcd7-1734b3333d96",
+      "name": "PostgreSQL Company",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "pageContent",
+              "value": "={{'[' + $json[\"title\"] + ']\\n' + $json[\"content\"].trim()}}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "147d8ce8-8c8c-42d5-9861-87a5ea42b0cc",
+      "name": "Set Company",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "product_name",
+              "value": "={{ $json.product_name }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "ingredients",
+              "value": "={{ $json.ingredients }}"
+            },
+            {
+              "name": "allergens",
+              "value": "={{ $json.allergens }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "pageContent",
+              "value": "={{$json[\"product_name\"] + '. Категория: ' + $json[\"category\"] + '. Состав: ' + $json[\"ingredients\"] + '. Аллергены: ' + $json[\"allergens\"] + '. Описание: ' + $json[\"description\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "e40c7c8b-65bc-460e-b0b2-a871062e8f08",
+      "name": "Set Product",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        784
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        624
+      ],
+      "id": "1c4c78b8-f2ed-4064-8fc2-d84e6c4e7f2d",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "company_info",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        464
+      ],
+      "id": "71c5fc87-245b-4d43-8729-0c7f2498c5af",
+      "name": "Qdrant Vector Store"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.pageContent }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "category",
+                "value": "={{ $('PostgreSQL Company').item.json.category }}"
+              },
+              {
+                "name": "source",
+                "value": "company_info"
+              },
+              {
+                "name": "title",
+                "value": "={{ $('PostgreSQL Company').item.json.title }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        608
+      ],
+      "id": "45396117-7e81-4954-b554-5bdfe34309e2",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "product_info",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        800
+      ],
+      "id": "5aa52679-fbad-4307-8ddf-3c37e57f2c07",
+      "name": "Qdrant Vector Store1"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "= {{ $json.pageContent }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "product_name",
+                "value": "={{ $('Set Product').item.json.product_name }}"
+              },
+              {
+                "name": "category",
+                "value": "={{ $('Set Product').item.json.category }}"
+              },
+              {
+                "name": "ingredients",
+                "value": "={{ $('Set Product').item.json.ingredients }}"
+              },
+              {
+                "name": "allergens",
+                "value": "={{ $('Set Product').item.json.allergens }}"
+              },
+              {
+                "name": "description",
+                "value": "={{ $('Set Product').item.json.description }}"
+              },
+              {
+                "name": "source",
+                "value": "product_info"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        272,
+        992
+      ],
+      "id": "77bdb56d-c237-43ca-9517-977689cc29a1",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        80,
+        992
+      ],
+      "id": "aefec463-7b5d-475f-ae47-0409c874b6b0",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        272,
+        608
+      ],
+      "id": "17bd224e-c83a-44da-af2f-9d3a0edeaebb",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "recipes",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "805bdd71-d25a-4d08-a1b7-b75cb3b98973",
+      "name": "Qdrant Vector Store3"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.pageContent }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "recipes"
+              },
+              {
+                "name": "product_type",
+                "value": "={{ $('PostgreSQL_RECIPES').item.json.product_type }}"
+              },
+              {
+                "name": "title",
+                "value": "={{ $('PostgreSQL_RECIPES').item.json.title }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        128,
+        160
+      ],
+      "id": "ca5c9e5e-a08b-482b-9c14-0d2dd373bc09",
+      "name": "Default Data Loader2"
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        64,
+        288
+      ],
+      "id": "f9bdaa5b-a902-43a9-9a9e-bad36b8b60a9",
+      "name": "Recursive Character Text Splitter2"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  product_type, title, instructions, serving_tips, alternative\nFROM recipes;",
+        "options": {}
+      },
+      "id": "be0ab47e-fc38-4e62-9d4b-0f95419b6123",
+      "name": "PostgreSQL_RECIPES",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT product_name, category, ingredients, allergens, description FROM product_info",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -656,
+        768
+      ],
+      "id": "97ff57ca-606c-4db0-bf95-df2597a7e156",
+      "name": "Postgres"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        1008
+      ],
+      "id": "2ff3f196-72be-431c-8af2-99b4ae5fa7c6",
+      "name": "Embeddings Ollama"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        608
+      ],
+      "id": "1918fea9-24be-4ea0-9465-e3378aa4d8d0",
+      "name": "Embeddings Ollama1"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        192
+      ],
+      "id": "e6b4a89e-f564-4bab-8f47-4e752e080f37",
+      "name": "Embeddings Ollama2"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "pageContent",
+              "value": "={{\n  '[' + $json.title + ' — ' + $json.product_type + ']' + '\\n' +\n  'Инструкции: ' + $json.instructions.trim() + '\\n' +\n  'Подача: ' + ($json.serving_tips ? $json.serving_tips.trim() : '—') + '\\n' +\n  'Альтернатива: ' + ($json.alternative ? $json.alternative.trim() : '—')\n}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c1608311-7b08-4362-b2fa-ba33fd327045",
+      "name": "Set recipes",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.pageContent }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "id",
+                "value": "={{ $('PostgreSQL HystoryInfo').item.json.id }}"
+              },
+              {
+                "name": "source",
+                "value": "dumpling_articles"
+              },
+              {
+                "name": "title",
+                "value": "={{ $('PostgreSQL HystoryInfo').item.json.title }}"
+              },
+              {
+                "name": "tags",
+                "value": "={{ $('PostgreSQL HystoryInfo').item.json.tags }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1328
+      ],
+      "id": "9e5a1db0-a1e3-4a01-8328-622db2c82374",
+      "name": "Default Data Loader3"
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        112,
+        1440
+      ],
+      "id": "c7fe4e9c-57f7-49a2-b659-95fc3cbd25e9",
+      "name": "Recursive Character Text Splitter3"
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        1344
+      ],
+      "id": "be90a2d2-72c3-49fd-aa33-0aa713ccd96d",
+      "name": "Embeddings Ollama3"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, title, content, tags FROM dumpling_articles;",
+        "options": {}
+      },
+      "id": "ae757cc5-dbe7-4f9c-8cbc-81f63df3e204",
+      "name": "PostgreSQL HystoryInfo",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        1104
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "pageContent",
+              "value": "={{'[' + $json[\"title\"] + ']\\n' + $json[\"content\"].trim()}}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "12c48a59-6ce3-4f6b-a983-43f8193aed9d",
+      "name": "Set HystoryInfo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        1104
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "dumpling_articles",
+          "mode": "list",
+          "cachedResultName": "dumpling_articles"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        1152
+      ],
+      "id": "618549dc-f6f5-4879-b7bd-5774aeb6f0c3",
+      "name": "Qdrant HystoryInfo"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL Company",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "PostgreSQL_RECIPES",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "PostgreSQL HystoryInfo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL Company": {
+      "main": [
+        [
+          {
+            "node": "Set Company",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Company": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Product": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader2": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store3",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter2": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader2",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL_RECIPES": {
+      "main": [
+        [
+          {
+            "node": "Set recipes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "main": [
+        [
+          {
+            "node": "Set Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store3",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set recipes": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader3": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant HystoryInfo",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter3": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader3",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant HystoryInfo",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL HystoryInfo": {
+      "main": [
+        [
+          {
+            "node": "Set HystoryInfo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set HystoryInfo": {
+      "main": [
+        [
+          {
+            "node": "Qdrant HystoryInfo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}

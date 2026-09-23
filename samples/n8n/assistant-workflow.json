@@ -1,0 +1,1592 @@
+{
+  "name": "Dobroty Portfolio - AI Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1120,
+        352
+      ],
+      "id": "5cb15e13-4e89-463a-9284-563f3f5002e9",
+      "name": "Telegram Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5457a566-f419-4c9b-a56d-565c1cae842a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "55f77abf-758d-40c2-8b9f-5865d4154502",
+                    "leftValue": "={{ $json.message_type }}",
+                    "rightValue": "voice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -496,
+        432
+      ],
+      "id": "e3e63323-2667-49e9-9710-04af46177f01",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -176,
+        592
+      ],
+      "id": "c72a014b-cb29-4ec5-a44c-c3f50c986b00",
+      "name": "OpenAI"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message_text }}",
+        "options": {
+          "systemMessage": "You are a polite and helpful assistant for a company that produces frozen dumplings and vareniki. Your task is to provide short, accurate, and friendly answers in the same language as the customer's input.\n\nYou can:\nAnswer questions about products, ingredients, and allergens.\n\nAnswer questions about delivery, working hours, pickup points, and contact information.\n\nAnswer questions about cooking instructions and serving tips (recipes).\n\nAnswer questions about the history, varieties, nutritional benefits, and cultural significance of dumplings and vareniki.\n\nRetrieve and refer to previous conversations with the same customer, if available in the chat_logs collection (based on user_id), but use the customer’s first_name only if it comes from the current incoming message — do not take it from the database.\n\nYou must:\nAlways first search the chat_logs collection for relevant past interactions with this customer.\n\nIf a relevant past message exists — use it to maintain continuity in the conversation.\n\nIf no relevant message is found — use one of the following collections for answers:\n\nproduct_info — information about dumplings and vareniki\n\ncompany_info — general company information (delivery, contacts, working hours, pickup points)\n\nrecipes — cooking instructions and serving recommendations\n\ndumpling_articles — historical facts, varieties, nutritional benefits, and cultural significance of dumplings and vareniki\n\nIf a clear answer exists in the knowledge base — provide it and stop.\n\nIf no answer is found — politely say you don’t know and mention that you can forward the request to a manager who will follow up with the customer.\n\nIf the retrieved information from the database is in Russian and the customer's message is in another language, you must first translate the response into the customer's language before sending it. The translation must be natural and clear.\n\nIf the customer explicitly requests to be contacted by a manager, human, representative, or company leadership, you must:\n\nRespond with a single line.\n\nThe line must start with the word \"manager\".\n\nAfter that, briefly summarize the customer’s request (1–2 sentences).\n\nDo not include greetings or explanations — just send the message for further processing.\n\nImportant rules:\nThe customer's name is: {{ $json.user_name.trim() }}\n\nIf the name looks like a real name (does not start with \"ID:\" or \"Anon:\"),\nbegin your response with a greeting using the first word of the name, for example:\n\"Dobrý den, [First Name]!\" or \"Спасибо за вопрос, [Имя]!\"\n\nIf the name starts with \"ID:\" or \"Anon:\" — respond without a personal greeting.\n\nNever invent phone numbers, delivery conditions, or any sensitive company information — only use verified data from the database.\n",
+          "maxIterations": 3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        352,
+        160
+      ],
+      "id": "9039bffa-0bc7-4a3b-95b8-b589fd1611b1",
+      "name": "AI Agent",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Merge').item.json.user_id }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1712,
+        112
+      ],
+      "id": "19502d93-2924-4548-a5df-c9186f5e6102",
+      "name": "Telegram1"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -368,
+        592
+      ],
+      "id": "5405b63a-d32a-4db8-900c-6b3b37ef3f2b",
+      "name": "Telegram_VOIS"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        80,
+        192
+      ],
+      "id": "52157305-9b0e-439b-8c0b-33a1e77611fb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SHEET_NAME",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_type": "={{ $('Merge').item.json.message_type }}",
+            "first_name": "={{ $('Merge').item.json.user_name }}",
+            "telegram_user_id": "={{ $('Merge').item.json.user_id }}",
+            "question": "={{ $('Merge').item.json.message_text }}",
+            "answer": "={{ $json.text }}",
+            "created_at": "AI agent"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id ",
+              "displayName": "id ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "telegram_user_id",
+              "displayName": "telegram_user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "first_name",
+              "displayName": "first_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_type",
+              "displayName": "message_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "question",
+              "displayName": "question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "answer",
+              "displayName": "answer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1600,
+        432
+      ],
+      "id": "f264f130-63ea-49d1-a9f0-1fd55469875e",
+      "name": "Google Sheets"
+    },
+    {
+      "parameters": {
+        "jsCode": "function escapeMarkdownV2(text) {\n  return text\n    .replace(/\\*/g, '\\\\*')\n    .replace(/_/g, '\\\\_')\n    .replace(/\\[/g, '\\\\[')\n    .replace(/\\]/g, '\\\\]')\n    .replace(/\\(/g, '\\(')\n    .replace(/\\)/g, '\\)')\n    .replace(/~/g, '\\\\~')\n    .replace(/`/g, '\\\\`')\n    .replace(/>/g, '\\\\>')\n    .replace(/#/g, '\\\\#')\n    .replace(/\\+/g, '\\+')\n    .replace(/-/g, '\\-')\n    .replace(/=/g, '\\\\=')\n    .replace(/\\|/g, '\\\\|')\n    .replace(/{/g, '\\\\{')\n    .replace(/}/g, '\\\\}')\n    .replace(/!/g, '\\!')\n}\n\nreturn items.map(item => {\n  const originalText = item.json.output || '';\n  const cleaned = escapeMarkdownV2(originalText);\n  return {\n    json: {\n      text: cleaned\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        272
+      ],
+      "id": "2c96c322-6424-4ec2-839b-5f53b78ae9b8",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        192,
+        880
+      ],
+      "id": "6e837d82-de9b-46d0-ba27-8fc4764e0631",
+      "name": "Embeddings Ollama"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        320,
+        864
+      ],
+      "id": "92d00371-e583-4925-9c63-f8886f08d805",
+      "name": "Embeddings Ollama1"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        464,
+        864
+      ],
+      "id": "23bacaba-13a8-415c-93ff-82efca55ae7a",
+      "name": "Embeddings Ollama2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.user_id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        352
+      ],
+      "id": "97595fd9-9723-4c12-aa78-bec23859b9d6",
+      "name": "Postgres Chat Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        368
+      ],
+      "id": "a9db843a-4666-4c5d-b86a-6a4e2b729aa1",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "company_info",
+        "toolDescription": "A vector database containing general information about the company. Each entry covers topics such as company description, contact information, delivery conditions, pickup points, and working hours. This database helps the assistant provide accurate responses about logistics, contacts, and general company operations. Important: Always use only verified information from this database and never invent new details.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "company_info",
+          "mode": "list",
+          "cachedResultName": "company_info"
+        },
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        720
+      ],
+      "id": "161b185c-cb3c-4d17-93b2-d0147c8bb037",
+      "name": "Qdrant company_info"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "product_info",
+        "toolDescription": "information about production",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "product_info",
+          "mode": "list",
+          "cachedResultName": "product_info"
+        },
+        "topK": 20,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        608
+      ],
+      "id": "6848b7d5-65ef-4fb3-bc41-555f84e60df7",
+      "name": "Qdrant product_info"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "recipes",
+        "toolDescription": "A vector database containing recipes and cooking instructions for the company's frozen dumplings and vareniki. Each entry includes: the product type (e.g., dumplings or vareniki), the recipe title, detailed cooking instructions, serving tips for the dish, and possible alternative preparation methods (if available). This database is used to help the assistant answer questions about how to prepare and serve different types of dumplings and vareniki. Important: Always provide the correct and verified preparation method from the database. Never invent new cooking instructions if they are not available.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "recipes",
+          "mode": "list",
+          "cachedResultName": "recipes"
+        },
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        720
+      ],
+      "id": "e78bb25e-0ba6-4f55-92fc-3174afe96461",
+      "name": "Qdrant recipes"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        864
+      ],
+      "id": "de9059d8-8bd1-4408-abc9-06728a5bbcff",
+      "name": "Embeddings Ollama3"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $('Merge').first().json.message_text }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "user_id",
+                "value": "={{ $('Merge').item.json.user_id }}"
+              },
+              {
+                "name": "user_name",
+                "value": "={{ $('Merge').item.json.user_name }}"
+              },
+              {
+                "name": "timestamp",
+                "value": "={{ $now }}"
+              },
+              {
+                "name": "ai_response",
+                "value": "={{ $('AI Agent').item.json.output }}"
+              },
+              {
+                "name": "message_type",
+                "value": "={{ $('Merge').item.json.message_type }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        832
+      ],
+      "id": "8076bcba-9d45-4556-872f-6ba5fa90c729",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "model": "mistral:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        624,
+        848
+      ],
+      "id": "ab70f97e-67ef-4b85-8936-411114c608b1",
+      "name": "Embeddings Ollama4"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "chat_logs",
+        "toolDescription": "A vector database that stores customer interaction logs.\nEach entry includes:\nthe original user question,\nthe full AI response,\nthe timestamp of the interaction,\nand user metadata (user ID and name).\nUse this database to retrieve relevant past conversations with the same user to maintain continuity and context in the dialogue.\nFocus on finding the most semantically similar previous messages when answering a new user request.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "chat_logs",
+          "mode": "list",
+          "cachedResultName": "chat_logs"
+        },
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        608
+      ],
+      "id": "2a7dec36-4f97-4059-bc8d-98cb79297490",
+      "name": "Qdrant Chat_Logs"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        992
+      ],
+      "id": "fc70c506-0b2f-498c-bdc1-a5d369012183",
+      "name": "Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        752,
+        864
+      ],
+      "id": "c99c962b-00d8-4166-8b75-c205a122adff",
+      "name": "Embeddings Ollama5"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "chat_logs",
+          "mode": "list",
+          "cachedResultName": "chat_logs"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        592
+      ],
+      "id": "4e914aaf-f955-41f5-9071-5f4f18e87bfb",
+      "name": "Qdrant chat_logs"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "dumpling_articles",
+        "toolDescription": "Knowledge Base: \"dumpling_articles\"\n\nThis knowledge base contains articles related to dumplings and vareniki.\nIt includes historical facts, different types and varieties, preparation methods, nutritional benefits, and cultural significance.\n\nEach entry in the database has the following fields:\n\nid (number): Unique identifier for the entry.\n\ntitle (text): The title or topic of the article.\n\ntags (text): Keywords that categorize the article.\n\npageContent (text): The full text content of the article.\n\nYou should use this knowledge base to answer user questions accurately and enrich your responses with historical, cultural, or culinary facts about dumplings and vareniki when appropriate.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "dumpling_articles",
+          "mode": "list",
+          "cachedResultName": "dumpling_articles"
+        },
+        "topK": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        720
+      ],
+      "id": "57819f1d-049a-4c06-b618-7e930f02c040",
+      "name": "Qdrant DumplingFullInfo"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.message.chat.id}}",
+        "text": "=⏳ Thanks {{ $json.message.from.first_name }}! \nYour question has been received. Preparing the answer...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -944,
+        144
+      ],
+      "id": "1044ab18-a9bc-4664-aacc-f4165ea97d28",
+      "name": "Telegram2"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        672,
+        368
+      ],
+      "id": "478016d2-d11a-40f2-b6ba-47f0c4a0f613",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "96e0cc26-b794-4b6b-8e03-ca1c7087766a",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "manager",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        160
+      ],
+      "id": "81072ccd-568a-4317-b4b2-12dc39047116",
+      "name": "NeedsManager"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Merge').item.json.user_id }}",
+        "message": "Пожалуйста, укажите ваше имя и email, чтобы мы могли связаться с вами, нажмите на кнопку \"Respond\" и заполните все поля пожалуйста",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Имя",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Мэйл",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Телефон",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Суть вопроса",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1264,
+        -288
+      ],
+      "id": "53b95361-ea81-414a-8ab0-009a6c29274c",
+      "name": "AskForDetails"
+    },
+    {
+      "parameters": {
+        "sendTo": "support@example.invalid",
+        "subject": "new client",
+        "emailType": "text",
+        "message": "=Имя: {{ $json.data[\"Имя\"] }}\nEmail: {{ $json.data[\"Мэйл\"] }}\nТелефон: {{ $json.data[\"Телефон\"] }}\nСообщение: {{ $json.data[\"Суть вопроса\"] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1440,
+        -288
+      ],
+      "id": "628ef88b-1267-4743-b7d5-77e6ab8dabd0",
+      "name": "Gmail"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "Большое спасибо за запрос! Наш менеджер свяжется с вами в ближайшее время",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1632,
+        -288
+      ],
+      "id": "e3718f3e-4ed2-470e-a891-569a1230b84c",
+      "name": "Telegram"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Merge').item.json.user_id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        -464
+      ],
+      "id": "1f032cb3-f7c1-4a71-b9df-1def9a379a1c",
+      "name": "Telegram3"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "portfolio-chat-demo",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        592
+      ],
+      "id": "9a3691ce-edce-4983-920a-6c1ae75d8095",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "98eeca51-04b0-4d34-8808-e48ddc604de3",
+              "name": "=user_id",
+              "value": "={{ $json.body.userIdentifier }}",
+              "type": "string"
+            },
+            {
+              "id": "5cdfeb1f-bf45-4ea5-9675-ebb2350af7cd",
+              "name": "user_name",
+              "value": "={{ $json.body.customerName ? $json.body.customerName.replace(/\\n/g, '').trim() : $json.body.userIdentifier }}",
+              "type": "string"
+            },
+            {
+              "id": "bce62bae-c7d1-4cc7-a8c4-93ec446dfd55",
+              "name": "message_text",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "53c26e6c-19f6-42bb-b0bd-a9aaaf55e345",
+              "name": "source",
+              "value": "chat",
+              "type": "string"
+            },
+            {
+              "id": "154da9f9-b9db-4f0c-8fbf-3d97a521462a",
+              "name": "message_type",
+              "value": "text",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        592
+      ],
+      "id": "b2c24c75-91bf-4515-80a3-3587ef8ee55e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "98eeca51-04b0-4d34-8808-e48ddc604de3",
+              "name": "=user_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5cdfeb1f-bf45-4ea5-9675-ebb2350af7cd",
+              "name": "user_name",
+              "value": "={{ $json.message.chat.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "bce62bae-c7d1-4cc7-a8c4-93ec446dfd55",
+              "name": "message_text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "53c26e6c-19f6-42bb-b0bd-a9aaaf55e345",
+              "name": "source",
+              "value": "telegram",
+              "type": "string"
+            },
+            {
+              "id": "154da9f9-b9db-4f0c-8fbf-3d97a521462a",
+              "name": "message_type",
+              "value": "text",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        272
+      ],
+      "id": "fb2eebce-8c52-45d4-9510-6e3c654cdde9",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7a37904c-ade2-45c9-81e7-4dae6688be07",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -944,
+        368
+      ],
+      "id": "a3d482bc-b619-4674-9a5f-b6648e07c49b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "98eeca51-04b0-4d34-8808-e48ddc604de3",
+              "name": "=user_id",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "string"
+            },
+            {
+              "id": "5cdfeb1f-bf45-4ea5-9675-ebb2350af7cd",
+              "name": "user_name",
+              "value": "={{ $json.message.chat.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "bce62bae-c7d1-4cc7-a8c4-93ec446dfd55",
+              "name": "message_voice",
+              "value": "={{ $json.message.voice.file_id }}",
+              "type": "string"
+            },
+            {
+              "id": "53c26e6c-19f6-42bb-b0bd-a9aaaf55e345",
+              "name": "source",
+              "value": "telegram",
+              "type": "string"
+            },
+            {
+              "id": "154da9f9-b9db-4f0c-8fbf-3d97a521462a",
+              "name": "message_type",
+              "value": "voice",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        432
+      ],
+      "id": "4493a3fe-df27-476e-91dd-e58d7446e45c",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "98eeca51-04b0-4d34-8808-e48ddc604de3",
+              "name": "=user_id",
+              "value": "={{ $('Switch').item.json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5cdfeb1f-bf45-4ea5-9675-ebb2350af7cd",
+              "name": "user_name",
+              "value": "={{ $('Switch').item.json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "bce62bae-c7d1-4cc7-a8c4-93ec446dfd55",
+              "name": "message_text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "53c26e6c-19f6-42bb-b0bd-a9aaaf55e345",
+              "name": "source",
+              "value": "telegram",
+              "type": "string"
+            },
+            {
+              "id": "154da9f9-b9db-4f0c-8fbf-3d97a521462a",
+              "name": "message_type",
+              "value": "voice",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        480
+      ],
+      "id": "cee964d7-d091-4ddf-be89-1be22689cb87",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "98eeca51-04b0-4d34-8808-e48ddc604de3",
+              "name": "=user_id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5cdfeb1f-bf45-4ea5-9675-ebb2350af7cd",
+              "name": "user_name",
+              "value": "={{ $json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "bce62bae-c7d1-4cc7-a8c4-93ec446dfd55",
+              "name": "message_text",
+              "value": "={{ $json.message_text }}",
+              "type": "string"
+            },
+            {
+              "id": "53c26e6c-19f6-42bb-b0bd-a9aaaf55e345",
+              "name": "source",
+              "value": "={{ $json.source }}",
+              "type": "string"
+            },
+            {
+              "id": "154da9f9-b9db-4f0c-8fbf-3d97a521462a",
+              "name": "message_type",
+              "value": "={{ $json.message_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        240
+      ],
+      "id": "4951a8fa-dcb9-4654-bc6f-da2e42ff910f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ed9b8a64-0fe8-4389-b7b3-442c8d4f56fe",
+              "leftValue": "={{ $('Merge').item.json.source }}",
+              "rightValue": "telegram",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        224
+      ],
+      "id": "ce5177f4-0ebf-48ac-90db-9d5b78c9cba2",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ JSON.stringify({ reply: $json.reply }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1872,
+        304
+      ],
+      "id": "93c82e43-1c04-4e2d-a1eb-f51fa2ca7a19",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const reply = $json.output || $json.text || '';\nreturn [{ json: { reply } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        304
+      ],
+      "id": "b2c103fd-517b-467d-8a07-12fbac513682",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "641441bf-3f33-4493-b7b6-13d86546a5f3",
+              "leftValue": "={{ $('Merge').item.json.source }}",
+              "rightValue": "telegram",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        -48
+      ],
+      "id": "bc6af099-776c-4eab-a254-44454d9b6e9f",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"reply\": \"Если хотите связаться с руководством, пишите на email - support@example.invalid, либо звоните по телефону REDACTED_PHONE\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1264,
+        -64
+      ],
+      "id": "29d69929-59cd-449e-a7c4-ae346335f519",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram_VOIS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "NeedsManager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram_VOIS": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Qdrant chat_logs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant company_info",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant product_info",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant recipes",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant company_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant product_info": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant recipes": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant chat_logs",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant chat_logs",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama4": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Chat_Logs",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Chat_Logs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama5": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant DumplingFullInfo",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant DumplingFullInfo": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram2": {
+      "main": [
+        []
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NeedsManager": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AskForDetails": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AskForDetails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}

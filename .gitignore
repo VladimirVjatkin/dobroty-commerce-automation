@@ -1,0 +1,56 @@
+# Conservative public-repository ignore rules.
+# This repository must never contain secrets, production configuration,
+# customer data, or build artifacts. When in doubt, exclude it.
+
+#################
+## Secrets / credentials / certificates
+#################
+.env
+.env.*
+appsettings*.json
+# Exception: the example configuration file for the standalone LiveChat sample contains no
+# real endpoint, credentials or secrets and is meant to be committed and copied by readers.
+!/samples/livechat/src/Portfolio.LiveChat/appsettings.Example.json
+*.bak
+*.pfx
+*.p12
+*.key
+*.pem
+*credentials*
+*secret*
+*token*
+
+#################
+## Build output
+#################
+bin/
+obj/
+node_modules/
+dist/
+build/
+
+#################
+## Logs
+#################
+logs/
+*.log
+
+#################
+## OS / editor
+#################
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+#################
+## Temporary / working / export directories
+#################
+tmp/
+.tmp/
+temp/
+export/
+*.orig
+*.swp
+~$*

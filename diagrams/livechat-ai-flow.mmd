@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant C as Customer
+    participant W as Storefront widget
+    participant B as Backend (validation + timeout)
+    participant H as External webhook
+    participant N as n8n (AI Agent / RAG)
+
+    C->>W: Types a message
+    W->>B: POST chat message
+    Note over B: Validates length and body size<br/>Per-request/IP rate limiting: PLANNED, not yet implemented
+    B->>H: Forwards message (bounded timeout, no retries)
+    H->>N: Triggers AI workflow
+    N-->>H: Generates reply (RAG-assisted)
+    H-->>B: Returns reply JSON
+    B-->>W: Returns reply or a localized error
+    Note over W: Reply is parsed as Markdown,<br/>then sanitized (DOMPurify, explicit allowlist)<br/>before being rendered
+    W-->>C: Displays the response

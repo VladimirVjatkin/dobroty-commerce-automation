@@ -1,0 +1,11 @@
+{
+  "name": "portfolio-livechat-frontend-tests",
+  "private": true,
+  "description": "Isolated Node/jsdom security test harness for the LiveChat sample's frontend. Not part of the .NET solution or build; run manually as documented in the sample README.",
+  "scripts": {
+    "test": "node xss-test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0"
+  }
+}

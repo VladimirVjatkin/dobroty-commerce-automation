@@ -1,0 +1,15 @@
+flowchart LR
+    Placed[OrderPlaced event] --> DocConsumer[Business-event consumer]
+    DocConsumer --> Doc[Document generation]
+    Doc --> Queue1[(Queued email)]
+
+    Paid[OrderPaid event] --> GiftConsumer[Business-event consumer]
+    GiftConsumer --> Activate[Gift-card activation]
+    Activate --> Queue2[(Queued email)]
+
+    Queue1 --> Sender[Scheduled mail sender]
+    Queue2 --> Sender
+
+    subgraph tiers[Independent scheduled processing]
+        Daily[Daily scheduled task] --> Tier[Recalculate customer loyalty tier]
+    end

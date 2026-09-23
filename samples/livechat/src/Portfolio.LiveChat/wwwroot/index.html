@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio LiveChat Sample</title>
+  <link rel="stylesheet" href="css/chat.css">
+</head>
+<body>
+  <main class="page">
+    <h1 class="page__title">LiveChat Sample</h1>
+    <p class="page__note">
+      Standalone portfolio demo of a hardened chat integration pattern — not the production
+      plugin, and not connected to any production service.
+    </p>
+
+    <section class="chat-panel" aria-labelledby="chat-panel-heading">
+      <h2 id="chat-panel-heading" class="chat-panel__heading">Chat</h2>
+
+      <div id="chat-log" class="chat-log" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation"></div>
+
+      <form id="chat-form" class="chat-form" novalidate>
+        <label for="chat-input" class="chat-form__label">Your message</label>
+        <textarea
+          id="chat-input"
+          class="chat-form__input"
+          rows="3"
+          maxlength="1000"
+          placeholder="Type a message. Enter sends, Shift+Enter starts a new line."
+          aria-describedby="chat-form-hint"></textarea>
+        <p id="chat-form-hint" class="chat-form__hint">Enter sends the message. Shift+Enter inserts a new line.</p>
+        <button type="submit" id="chat-send" class="chat-form__send">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="vendor/marked.min.js"></script>
+  <script src="vendor/purify.min.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>

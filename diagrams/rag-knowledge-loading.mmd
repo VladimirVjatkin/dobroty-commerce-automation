@@ -1,0 +1,8 @@
+flowchart LR
+    PG[(PostgreSQL knowledge sources)] --> Prep[Document preparation and chunking]
+    Prep --> Embed[Ollama embeddings]
+    Embed --> Qdrant[(Qdrant vector store)]
+    Qdrant --> Tools[Retrieval tools]
+    Tools --> Agent[AI Agent]
+    Mem[(PostgreSQL conversation memory)] --> Agent
+    Agent --> Reply[Generated reply]

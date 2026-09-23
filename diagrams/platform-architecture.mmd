@@ -1,0 +1,20 @@
+flowchart LR
+    Browser[Browser: storefront and admin] -->|HTTPS| Proxy[Reverse proxy]
+    Proxy --> App[ASP.NET Core / nopCommerce]
+    App --> Plugins[Custom plugins]
+    Plugins --> Services[nopCommerce services]
+    Services --> DB[(SQL Server)]
+
+    Plugins -->|company lookup| ARES[ARES public registry API]
+    Plugins -->|chat message| Hook[External webhook]
+    Hook --> AIWorkflow[n8n-orchestrated AI workflow]
+
+    subgraph automation[Order-driven automation]
+        Events[In-process order-event consumers]
+        Scheduler[Scheduled tasks]
+    end
+
+    Services --> Events
+    Services --> Scheduler
+    Events --> Queue[(Queued email)]
+    Queue --> SMTP[Email delivery]
