@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-23
 
-The storefront includes a chat widget that forwards customer messages to an externally hosted, n8n-orchestrated AI support workflow. This document describes what that workflow contains, and — deliberately — separates what is independently verifiable from what is reported, unvalidated or still planned. Overclaiming AI capability is one of the easiest ways to lose credibility in a technical interview, so this document is written to survive one.
+I designed and configured the n8n-orchestrated AI support workflow that the storefront chat widget connects to. This document describes the workflow's architecture and separates what is directly verified from its exported definition, what is owner-reported, and what is still open, so the AI capability described here is accurate rather than overstated.
 
 ## Architecture
 
@@ -55,7 +55,7 @@ These are real, open gaps — not implied criticisms of the workflow's design, b
 - **Answer quality and grounding.** No formal evaluation set or reproducible quality benchmark exists yet for the assistant's responses.
 - **Conversation memory isolation.** The workflow's design keys memory by a conversation identifier; whether that isolation is enforced correctly for every retrieval path has not been independently tested.
 - **Retrieval quality.** Embedding model choice, chunking strategy and retrieval relevance have not been benchmarked.
-- **Runtime reproduction.** The workflow has been reviewed statically from its exported definition; it has not been re-run end-to-end outside of production by anyone other than the workflow's own operator.
+- **Runtime reproduction.** The workflow has been reviewed statically from its exported definition; it has not been independently re-run end-to-end outside of the production environment.
 - **Latency and cost under load.** No measurements are available.
 
 ## Planned improvements
@@ -65,6 +65,6 @@ These are real, open gaps — not implied criticisms of the workflow's design, b
 - Server-to-server authentication between the storefront and the external workflow (currently the integration relies on the webhook URL not being guessed, which is not a substitute for authentication — see [SECURITY_HARDENING.md](SECURITY_HARDENING.md)).
 - Per-client rate limiting on the chat endpoint, to bound both abuse and API cost.
 
-## What this integration is, and is not
+## Scope of the AI engineering work
 
-This is an integration project: connecting a storefront to an existing, externally designed and hosted AI workflow, and hardening the transport and rendering path between them. It is **not** a claim of having designed the retrieval architecture, trained a model, or built an AI agent from scratch. The engineering contribution documented in this repository is the storefront-side integration, its security hardening (see [SECURITY_HARDENING.md](SECURITY_HARDENING.md)), and the review of the exported workflow definitions described above.
+I designed and configured this n8n-based AI assistant workflow myself: the agent's tool/retrieval setup, the Qdrant collections and their embeddings, the PostgreSQL-backed conversation memory, the knowledge-loading pipeline, and both the web-chat and Telegram entry points. I did not train a model or build OpenAI, Ollama or Qdrant themselves — those are third-party services I selected, configured and orchestrate. Claude, ChatGPT and Codex were used as engineering assistants during implementation, debugging and documentation; the architecture, configuration decisions, integration, validation and production deployment are mine, along with the storefront-side transport and its security hardening (see [SECURITY_HARDENING.md](SECURITY_HARDENING.md)).

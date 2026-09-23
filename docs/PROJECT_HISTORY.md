@@ -1,6 +1,6 @@
 # Project History
 
-Last updated: 2026-09-22
+Last updated: 2026-09-23
 
 This is a milestone-level history of how the project evolved, not a chronological dump of private commit hashes. Where a specific commit materially matters for understanding a decision, it is referenced in [SECURITY_HARDENING.md](SECURITY_HARDENING.md); everywhere else, this document describes what changed and why.
 
@@ -18,7 +18,7 @@ With the platform migration in place, seven custom plugins were built to cover t
 
 ## 4. AI assistant integration
 
-A storefront chat widget was connected to an externally hosted, n8n-orchestrated AI support workflow (OpenAI for responses, Ollama for embeddings, Qdrant for retrieval, PostgreSQL for conversation memory and knowledge sources), giving customers a way to ask product and order questions without a dedicated support team. This workflow itself was designed and is operated externally; the work covered in this repository is the storefront-side integration and its later hardening.
+I designed and built an n8n-orchestrated AI support workflow — OpenAI for responses, Ollama for embeddings, Qdrant for retrieval, PostgreSQL for conversation memory and knowledge sources — and connected it to a storefront chat widget and a Telegram channel, giving customers a way to ask product and order questions without a dedicated support team. Implementation and debugging were AI-assisted (Claude, ChatGPT, Codex); the architecture, configuration decisions, integration and validation are mine.
 
 ## 5. Repository and documentation cleanup
 
@@ -30,4 +30,4 @@ A dedicated security review of the AI chat integration found a cross-site-script
 
 ## 7. Public portfolio extraction
 
-This repository is the result of a deliberate, staged extraction from the private production project: an audit to classify what could safely be shared, explicit decisions about what to exclude (original plugin source code, real business identifiers, production infrastructure details), and a documentation-first first phase before any code samples are added. That process is itself part of the engineering story this portfolio is trying to tell.
+This repository is a curated extraction from the private production project: an audit classified what could safely be shared, and original plugin source code, real business identifiers and production infrastructure details were excluded. Documentation, architecture write-ups and standalone runnable samples ([`samples/livechat/`](../samples/livechat/README.md), [`samples/n8n/`](../samples/n8n/README.md)) are included so the engineering can be reviewed and run directly.

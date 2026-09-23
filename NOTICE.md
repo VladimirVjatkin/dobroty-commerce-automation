@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-23
 
-This file is informational for Phase 1 of this portfolio repository. It is **not** a license grant for the repository as a whole; no overall license has been declared yet, and no `LICENSE` file exists at this stage.
+This file is informational. It is **not** a license grant for the repository as a whole; no overall license has been declared yet, and no `LICENSE` file exists at this stage.
 
 ## Basis of this portfolio
 

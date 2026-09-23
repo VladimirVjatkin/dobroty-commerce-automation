@@ -1,10 +1,10 @@
 # Security Hardening: The LiveChat AI Integration
 
-Last updated: 2026-09-22
+Last updated: 2026-09-23
 
 This document is the technical write-up of the principal security case study in this portfolio: hardening the storefront's AI chat integration. A narrative version aimed at a general reader is in [../portfolio/CASE_STUDY.md](../portfolio/CASE_STUDY.md); this document lists the specific controls that were added, and what is deliberately still open.
 
-**Scope note:** everything below describes hardening of **this one integration** — the chat widget and its backend transport to an external AI workflow. It is not a claim of platform-wide security certification, and it does not imply that every other part of the store has received the same level of review.
+**Scope note:** everything below covers **this one integration** — the chat widget and its backend transport to the AI workflow. No other part of the store has received the same review depth.
 
 ## Engineering progression
 
@@ -39,13 +39,13 @@ This document is the technical write-up of the principal security case study in 
 - **Storage fallback:** if the browser's local storage is unavailable or throws, the widget falls back to an in-memory identifier for the current page load rather than failing to load.
 - **Accessibility improvements:** proper semantic roles and labels were added to the chat panel, its close control and its log region, along with focus management on open/close.
 
-## What this does not claim
+## Boundaries of this work
 
-- It does not claim server-side rate limiting for the chat endpoint — that remains planned, not implemented.
-- It does not claim authentication between the storefront and the external AI workflow beyond the webhook address itself not being public — that is a known gap, not a control.
-- It does not claim that the customer/session identifier sent to the AI workflow has been hardened against spoofing; that is a separate, not-yet-scoped piece of work.
-- It does not claim a Content Security Policy review has been completed for the storefront as a whole.
-- It does not claim a versioned, repeatable regression suite exists yet for this integration beyond the targeted tests described above.
+- Server-side rate limiting for the chat endpoint is planned, not implemented.
+- There is no authentication between the storefront and the AI workflow beyond the webhook address itself not being public.
+- The customer/session identifier sent to the AI workflow has not been hardened against spoofing; that is separate, unscoped work.
+- A Content Security Policy review for the storefront as a whole has not been completed.
+- Beyond the targeted tests described above, there is no versioned regression suite yet for this integration.
 
 ## Remaining work
 

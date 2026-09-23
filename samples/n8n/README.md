@@ -1,8 +1,8 @@
 # n8n Workflow Samples
 
-Last updated: 2026-09-22
+Last updated: 2026-09-23
 
-These are **sanitized portfolio copies** of two real n8n workflows that back the storefront's AI support integration (see [../../docs/AI_ASSISTANT.md](../../docs/AI_ASSISTANT.md)). They are provided so a reviewer can inspect the actual node-level architecture — not just a description of it — without any operational or personal data attached.
+These are **sanitized portfolio copies** of two real n8n workflows that back the storefront's AI support integration (see [../../docs/AI_ASSISTANT.md](../../docs/AI_ASSISTANT.md)). Both workflows were designed and configured by me — the AI Agent's tool/retrieval setup, the Qdrant collections, the PostgreSQL-backed memory, and the knowledge-loading pipeline are my design, implemented with AI-assisted engineering (Claude, ChatGPT, Codex). These copies are provided so a reviewer can inspect the actual node-level architecture — not just a description of it — without any operational or personal data attached, and without needing to take a third party's word for either the design or the sanitization.
 
 ## What "sanitized" means here, precisely
 
@@ -11,12 +11,12 @@ These are **sanitized portfolio copies** of two real n8n workflows that back the
 - **Production identifiers were removed or replaced with placeholders:** the storefront webhook path is now the placeholder `portfolio-chat-demo`; a support-contact email address was already a non-routable placeholder (`support@example.invalid`) in the source and remains so; Google Sheets document/tab references were already placeholder values (`REPLACE_WITH_GOOGLE_SHEET_ID` / `REPLACE_WITH_SHEET_NAME`) and remain so.
 - **The owner's personal name was removed from the AI system prompt.** The prompt originally illustrated a personalized-greeting rule using the owner's own first name as a worked example (e.g. *"Dobrý den, \<name\>!"*). Both example greetings were replaced with a bracketed placeholder — `[First Name]` / `[Имя]` — so the *rule* (greet the customer by the first word of their name, in their own language, only when a name is present) is still fully demonstrated, without using anyone's real name as the example.
 - **Workflow names were changed** from their internal working titles to neutral portfolio names (see below).
-- **Nothing else was changed.** No nodes were added or removed, no connections were altered, and no model/collection/limit configuration was edited. This was checked programmatically, not just asserted — see [Source vs. public node counts](#source-vs-public-node-counts) in the main response for this phase.
+- **Nothing else was changed.** No nodes were added or removed, no connections were altered, and no model/collection/limit configuration was edited — verified programmatically by diffing the source and public files' node and connection lists.
 
 ## What this is not
 
-- **This is not proof that this exact JSON is the currently running production version.** It is a snapshot, reviewed statically. Whether production has since diverged has not been checked here.
-- **This has not been imported into a running n8n instance as part of producing this sample.** The files were validated as well-formed JSON with internally consistent node references (see below), which is strong structural evidence of importability, but it is not the same as a confirmed successful import. If you import either file, do so into a disposable/test n8n instance and do not attach real credentials before inspecting it.
+- **This is not proof that this exact JSON is the currently running production version.** It is a reviewed snapshot; whether production has since diverged has not been checked here.
+- **Both files were successfully imported into an isolated, disposable n8n 1.72.1 instance** (a fresh `N8N_USER_FOLDER`, no shared state with any real environment) to confirm they import cleanly. They were not executed and no credentials were configured — every credential-requiring node showed as unconfigured, and both workflows imported with `active: false`. If you import either file yourself, use the same kind of disposable/test instance and do not attach real credentials before inspecting it.
 - **No customer data is included.** No real conversation content, no real names, no real order or contact information appears in either file — everything customer-shaped in these workflows (message text, user identifiers, memory keys) is a runtime *expression* (e.g. `{{ $json.body.message }}`) describing how the data flows, not a captured value.
 
 ## `assistant-workflow.json`
@@ -50,13 +50,13 @@ This workflow is triggered manually (`When clicking 'Test workflow'`) in the sou
 | `assistant-workflow.json` | 44 | 34 (31 node-level, 3 nested rule/condition-level) | 34 | 0 |
 | `knowledge-loader.json` | 25 | 7 (all node-level) | 7 | 0 |
 
-The replacement was done with a small script, not by hand, specifically so the mapping could be applied consistently and verified programmatically rather than trusted by eye. Because n8n's `connections` object (and every in-workflow expression such as `$('Node Name')`) refers to nodes **by name, not by ID**, remapping IDs required no changes anywhere else in either file — there was nothing else to update. This was confirmed, not assumed: after remapping, every connection target in both files was checked against the actual node list and all resolved correctly (see the validation results reported alongside this phase's response).
+The replacement was done with a small script, so the mapping could be applied consistently and verified programmatically. Because n8n's `connections` object (and every in-workflow expression such as `$('Node Name')`) refers to nodes **by name, not by ID**, remapping IDs required no changes anywhere else in either file — there was nothing else to update. After remapping, every connection target in both files was checked programmatically against the actual node list, and all of them resolved correctly.
 
 ## How to inspect / import
 
 To read the architecture without n8n at all, both files are plain, indented JSON — open them in any editor or JSON viewer and look at the `nodes` array (what each step does) and the `connections` object (how steps are wired together, by node name).
 
-To import into n8n for a closer look:
+Both files were already verified to import cleanly into a disposable n8n 1.72.1 instance (see [What this is not](#what-this-is-not) above). To do the same yourself:
 
 1. Use a disposable or local test n8n instance — not a production one.
 2. In the n8n editor, use **Import from File** and select `assistant-workflow.json` or `knowledge-loader.json`.
@@ -65,4 +65,4 @@ To import into n8n for a closer look:
 
 ## Source
 
-These files are derived from `RESEARCH/n8n/LiveChatALL - TEST2.json` and `RESEARCH/n8n/LoadToQdrant.json` in the private project repository, which are themselves already-sanitized exports reviewed for the project's internal technical audit. This phase applied an additional, portfolio-specific sanitization pass on top of that (documented above) before these copies were created.
+These files are derived from the exported production workflow definitions, which had already gone through an internal sanitization pass as part of the project's own technical documentation. An additional, portfolio-specific sanitization pass (documented above) was applied before these copies were published here.

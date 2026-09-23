@@ -51,7 +51,7 @@ Custom plugins integrate through nopCommerce's own extension points: dependency 
 2. **Company lookup during B2B checkout.** A plugin calls the Czech ARES public registry over HTTPS to autofill company details, with a bounded timeout and no local caching of the result beyond the current request.
 3. **Order-event automation.** Placing or paying for an order raises an in-process event; a plugin-registered consumer reacts synchronously within the same request lifecycle (not through a durable message broker) to generate documents or activate gift cards, then queues an email in the database for asynchronous delivery.
 4. **Scheduled processing.** A background scheduled task recalculates customer loyalty tiers on a recurring basis, independent of any single request.
-5. **AI chat.** The storefront widget posts a message to the backend, which validates it and forwards it to an externally hosted webhook. The response comes back as JSON and is rendered client-side after Markdown sanitization. See [AI_ASSISTANT.md](AI_ASSISTANT.md) and [diagrams/livechat-ai-flow.mmd](../diagrams/livechat-ai-flow.mmd) for the full flow.
+5. **AI chat.** The storefront widget posts a message to the backend, which validates it and forwards it to the AI webhook, hosted separately from the storefront application. The response comes back as JSON and is rendered client-side after Markdown sanitization. See [AI_ASSISTANT.md](AI_ASSISTANT.md) and [diagrams/livechat-ai-flow.mmd](../diagrams/livechat-ai-flow.mmd) for the full flow.
 
 ## What this architecture is not
 

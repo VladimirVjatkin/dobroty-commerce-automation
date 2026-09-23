@@ -1,10 +1,10 @@
 # Case Study: Hardening an AI Customer-Support Integration
 
-Last updated: 2026-09-22
+Last updated: 2026-09-23
 
 ## Context
 
-The storefront includes a chat widget that lets customers ask questions and get answers from an externally hosted, n8n-orchestrated AI support workflow (details in [../docs/AI_ASSISTANT.md](../docs/AI_ASSISTANT.md)). The widget itself — the part running inside the store — is a small piece of the overall system, but it is the part directly exposed to every visitor's browser, which makes it worth taking seriously from a security standpoint.
+The storefront includes a chat widget that lets customers ask questions and get answers from an n8n-orchestrated AI support workflow I designed, running on infrastructure separate from the storefront application (details in [../docs/AI_ASSISTANT.md](../docs/AI_ASSISTANT.md)). The widget itself — the part running inside the store — is a small piece of the overall system, but it is the part directly exposed to every visitor's browser, which makes it worth taking seriously from a security standpoint.
 
 ## Initial Design
 
