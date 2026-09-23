@@ -10,7 +10,7 @@ This project documents engineering work extending **nopCommerce**, an open-sourc
 
 ## Original source code
 
-Original nopCommerce-derived plugin source code from the production project is **not** included in this repository. Where code samples are added in a later phase, they will be standalone, rewritten examples designed to have no dependency on nopCommerce's own source projects (`Nop.Core`, `Nop.Data`, `Nop.Services`, `Nop.Web`, etc.), so they can be read, understood and run independently of nopCommerce.
+Original nopCommerce-derived plugin source code from the production project is **not** included in this repository. Code samples in this repository are standalone, rewritten examples designed to have no dependency on nopCommerce's own source projects (`Nop.Core`, `Nop.Data`, `Nop.Services`, `Nop.Web`, etc.), so they can be read, understood and run independently of nopCommerce.
 
 ## Third-party frontend dependencies
 
