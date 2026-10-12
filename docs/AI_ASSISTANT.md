@@ -44,9 +44,9 @@ The following is directly confirmed by inspecting the workflow's own exported de
 
 Sanitized, portfolio-safe copies of both n8n workflows described above are included in this repository at [`samples/n8n/`](../samples/n8n/README.md). Node identifiers were regenerated, credentials were removed or left unconfigured, and personal/production identifiers were replaced with placeholders before publishing. Both files were structurally validated (well-formed JSON, every connection target resolves to a real node) and were successfully imported into an isolated, disposable n8n 1.72.1 instance to confirm importability — they were not executed, and no real credentials were ever configured against them. This is not a claim that these files are byte-for-byte the exact workflow currently running in production; they are a reviewed, point-in-time snapshot. See [`samples/n8n/README.md`](../samples/n8n/README.md) for exactly what was sanitized and how the import was verified.
 
-## Owner-reported operational status
+## Operational status
 
-The business owner reports that the assistant is actively answering real customer questions through both the storefront Live Chat and Telegram, and that the WhatsApp channel that appears in earlier planning material has since been removed. This is the business owner's own operational report, not something independently re-verified by running the workflow.
+Dobroty is my own business's e-shop, so I am reporting this as both the business owner and the engineer who built the integration, not as an independent third-party verification. The assistant is actively answering real customer questions through both the storefront Live Chat and Telegram; the WhatsApp channel that appears in earlier planning material has since been removed. This status has not been independently re-verified by re-running the workflow end to end (see "Runtime reproduction" below).
 
 ## Not yet independently validated
 
