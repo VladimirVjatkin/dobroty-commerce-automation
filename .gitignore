@@ -54,3 +54,9 @@ export/
 *.orig
 *.swp
 ~$*
+
+#################
+## AI assistant working output (may contain personal contact data, e.g. CV drafts)
+#################
+Claude outputs/
+Codex outputs/
