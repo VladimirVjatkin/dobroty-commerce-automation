@@ -46,7 +46,7 @@ Sanitized, portfolio-safe copies of both n8n workflows described above are inclu
 
 ## Operational status
 
-Dobroty is my own business's e-shop, so I am reporting this as both the business owner and the engineer who built the integration, not as an independent third-party verification. The assistant is actively answering real customer questions through both the storefront Live Chat and Telegram; the WhatsApp channel that appears in earlier planning material has since been removed. This status has not been independently re-verified by re-running the workflow end to end (see "Runtime reproduction" below).
+Dobroty is my own business's e-shop (I am a 50% co-owner and the registered managing director of PELMEN.CZ s.r.o.), so I am reporting this as both a co-owner of the business and the engineer who built the integration, not as an independent third-party verification. The assistant is actively answering real customer questions through both the storefront Live Chat and Telegram; the WhatsApp channel that appears in earlier planning material has since been removed. This status has not been independently re-verified by re-running the workflow end to end (see "Runtime reproduction" below).
 
 ## Not yet independently validated
 

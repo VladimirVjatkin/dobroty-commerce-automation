@@ -162,7 +162,7 @@ I found the original XSS exposure during a security review of this integration, 
 
 ## Production and Deployment Experience
 
-Dobroty is my own business's e-shop: I am both the business owner and the engineer who designed and runs this AI/automation layer. The store and AI assistant are operational, serving real customers daily. The chat-hardening work described above was deployed to production by me personally, following a checklist: build a release artifact, back up and verify the existing plugin folder, stage and hash-verify the new files, swap them in, restart the service, and verify logs and functional behavior before considering the deployment complete. See [docs/DEPLOYMENT_OVERVIEW.md](docs/DEPLOYMENT_OVERVIEW.md) for the generalized process.
+Dobroty is my own business's e-shop: I am a 50% co-owner and the registered managing director of the company that runs it (PELMEN.CZ s.r.o.), and I am also the engineer who designed and runs this AI/automation layer. The store and AI assistant are operational, serving real customers daily. The chat-hardening work described above was deployed to production by me personally, following a checklist: build a release artifact, back up and verify the existing plugin folder, stage and hash-verify the new files, swap them in, restart the service, and verify logs and functional behavior before considering the deployment complete. See [docs/DEPLOYMENT_OVERVIEW.md](docs/DEPLOYMENT_OVERVIEW.md) for the generalized process.
 
 ## Repository Scope
 
